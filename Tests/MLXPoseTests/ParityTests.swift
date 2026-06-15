@@ -14,6 +14,7 @@
 //
 
 import Foundation
+import CoreGraphics
 import Testing
 import MLX
 @testable import MLXPose
@@ -59,5 +60,38 @@ struct ParityTests {
         let maxDiff = abs(out - ref).max().item(Float.self)
         print("Swift vs HF heatmaps: max|Δ| = \(maxDiff)")
         #expect(maxDiff < 1e-2)
+    }
+
+    @Test("Decoded keypoints match HF (image coords)")
+    func keypointParity() throws {
+        Device.setDefault(device: Device(.cpu))
+        guard let dir = Self.fixtureDir else {
+            print("parity fixtures not found — skipping")
+            return
+        }
+        let kpURL = dir.appendingPathComponent("parity_kp_fixture.safetensors")
+        guard FileManager.default.fileExists(atPath: kpURL.path) else {
+            print("kp fixture not found — skipping"); return
+        }
+        let weights = try loadArrays(url: dir.appendingPathComponent("weights.safetensors"))
+        let f = try loadArrays(url: kpURL)
+
+        let model = ViTPose(weights: weights)
+        let heatmaps = model(f["pixel_values"]!)
+
+        let box = f["box"]!.asArray(Float.self)   // x, y, w, h
+        let cs = Geometry.centerScale(for: CGRect(x: CGFloat(box[0]), y: CGFloat(box[1]),
+                                                  width: CGFloat(box[2]), height: CGFloat(box[3])))
+        let kps = HeatmapDecoder.decode(heatmaps, cs: cs)
+
+        let hf = f["hf_keypoints"]!.asArray(Float.self)   // (17,3): x,y,score
+        var maxErr: Float = 0
+        for i in 0 ..< kps.count {
+            let dx = abs(kps[i].x - hf[i * 3 + 0])
+            let dy = abs(kps[i].y - hf[i * 3 + 1])
+            maxErr = max(maxErr, max(dx, dy))
+        }
+        print("Swift vs HF keypoints: max pixel error = \(maxErr)")
+        #expect(maxErr < 2.0)
     }
 }

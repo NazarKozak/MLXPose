@@ -32,10 +32,11 @@ public struct PoseEstimator {
     /// Detect people, then estimate keypoints for each. Returns one `Pose` per person.
     public func estimate(_ pixelBuffer: CVPixelBuffer) async throws -> [Pose] {
         let boxes = try await detector.detect(in: pixelBuffer)
-        return boxes.map { box in
-            let input = Preprocess.makeInput(pixelBuffer, box: box)
+        return try boxes.map { box in
+            let cs = Geometry.centerScale(for: box)
+            let input = try Preprocess.makeInput(pixelBuffer, cs: cs)
             let heatmaps = model(input)
-            let keypoints = HeatmapDecoder.decode(heatmaps, box: box)
+            let keypoints = HeatmapDecoder.decode(heatmaps, cs: cs)
             return Pose(keypoints: keypoints, box: box)
         }
     }
