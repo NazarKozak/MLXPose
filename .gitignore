@@ -1,0 +1,18 @@
+# Swift / SPM
+.build/
+.swiftpm/
+*.xcodeproj
+DerivedData/
+
+# Python venv + caches
+.venv/
+__pycache__/
+*.pyc
+
+# Converted weights & fixtures (large binaries — download/convert locally)
+scripts/weights/
+*.safetensors
+*.npz
+
+# macOS
+.DS_Store
