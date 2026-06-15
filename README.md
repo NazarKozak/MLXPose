@@ -4,7 +4,10 @@
 
 MLXPose runs [ViTPose](https://github.com/ViTAE-Transformer/ViTPose) (a vision-transformer keypoint model) natively via [MLX Swift](https://github.com/ml-explore/mlx-swift), with Apple Vision supplying person bounding boxes. No PyTorch, no cloud, no server — just keypoints on your Mac, iPhone, iPad, or Vision Pro.
 
-> ⚠️ **Status: pre-release / under construction.** Phase 0 (weight conversion) is in progress. APIs below are the target design and may change.
+> **Status: working & verified.** The full Swift pipeline (affine preprocessing → ViTPose →
+> DARK sub-pixel decode) is numerically matched against the Hugging Face reference:
+> heatmaps `max|Δ| = 1.5e-6`, decoded keypoints `max error = 3e-5 px`. Packaging polish
+> (HF weights upload, ViTPose++, docs) still in progress.
 
 ---
 
@@ -58,6 +61,36 @@ CVPixelBuffer ─► PersonDetector (Apple Vision) ─► crop+affine ─► ViT
 | `vitPoseBaseSimple` | `usyd-community/vitpose-base-simple` | Phase 1 default (no MoE) |
 | `vitPosePlusBase` | `usyd-community/vitpose-plus-base` | Phase 2 — whole-body / MoE heads |
 | `vitPosePlusHuge` | `usyd-community/vitpose-plus-huge` | Phase 2 — highest accuracy |
+
+## Setup & verification
+
+1. Convert ViTPose weights to MLX (one-time):
+   ```bash
+   cd scripts
+   pip install -r requirements.txt   # or: mlx safetensors huggingface_hub torch transformers numpy
+   python convert_vitpose_to_mlx.py --model usyd-community/vitpose-base-simple \
+       --out ./weights/vitpose-base-simple-mlx --dtype float16
+   ```
+2. The Python reference (`scripts/mlx_vitpose.py`) reproduces the model in MLX and is
+   numerically checked against Hugging Face.
+
+### Running the tests
+
+Use **Xcode's build system** (not `swift test` — the CLI SPM build doesn't bundle
+mlx-swift's GPU metallib):
+
+```bash
+xcodebuild test -scheme MLXPose -destination 'platform=macOS'
+```
+
+Tests cover: heatmap parity (`max|Δ|=1.5e-6`), decoded-keypoint parity
+(`max 3e-5 px`), and an end-to-end render that draws a skeleton on a real image
+(`Examples/output/annotated.png`).
+
+## Demo
+
+See [`Examples/MLXPoseDemo`](Examples/MLXPoseDemo) — a SwiftUI app streaming the camera
+through MLXPose with a live skeleton overlay (`PoseOverlay`).
 
 ## Licensing
 

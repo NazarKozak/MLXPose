@@ -14,5 +14,8 @@ scripts/weights/
 *.safetensors
 *.npz
 
+# Generated demo artifacts
+Examples/output/
+
 # macOS
 .DS_Store

@@ -1,0 +1,11 @@
+# MLXPose conversion + reference/verification (Apple Silicon).
+# NumPy pinned <2.3 for scipy/transformers compatibility.
+numpy>=1.26,<2.3
+mlx
+safetensors
+huggingface_hub
+torch
+torchvision
+transformers
+pillow
+scipy
