@@ -9,13 +9,26 @@
 //
 
 import SwiftUI
+import AppKit
 
 @main
 struct MLXPoseDemoApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup("MLXPose Demo") {
             ContentView()
         }
         .windowResizability(.contentSize)
     }
+}
+
+/// Runs the SPM executable as a normal foreground GUI app (Dock icon, menu, focused
+/// window) — otherwise a package executable can launch without showing its window.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }
