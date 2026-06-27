@@ -15,6 +15,12 @@ public struct PoseEstimator {
     let model: ViTPose
     let detector: PersonDetector
 
+    /// Download the model from the Hugging Face Hub (cached) and load it.
+    public init(model: Model = .vitPoseBaseSimple, detector: PersonDetector) async throws {
+        let dir = try await WeightStore.shared.directory(for: model)
+        try self.init(weightsDirectory: dir, detector: detector)
+    }
+
     /// Load converted MLX weights (`weights.safetensors`) from a directory.
     public init(weightsDirectory: URL, detector: PersonDetector) throws {
         let url = weightsDirectory.appendingPathComponent("weights.safetensors")
@@ -53,6 +59,11 @@ public extension PoseEstimator {
     /// Convenience init with the default Apple Vision person detector.
     init(weightsDirectory: URL) throws {
         try self.init(weightsDirectory: weightsDirectory, detector: VisionPersonDetector())
+    }
+
+    /// Download from HF Hub (cached) and use the default Apple Vision person detector.
+    init(model: Model = .vitPoseBaseSimple) async throws {
+        try await self.init(model: model, detector: VisionPersonDetector())
     }
 }
 #endif
