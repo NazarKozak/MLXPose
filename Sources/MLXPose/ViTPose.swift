@@ -19,7 +19,8 @@ import MLX
 import MLXNN
 
 /// ViTPose backbone + simple decoder, operating on MLX arrays.
-public struct ViTPose {
+/// Weights are read-only after init, so it is safe to share across tasks.
+public struct ViTPose: @unchecked Sendable {
     public struct Config: Sendable {
         public var hidden = 768
         public var heads = 12

@@ -11,7 +11,7 @@ import Foundation
 import CoreVideo
 import MLX
 
-public struct PoseEstimator {
+public struct PoseEstimator: @unchecked Sendable {
     let model: ViTPose
     let detector: PersonDetector
 

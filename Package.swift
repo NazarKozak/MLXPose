@@ -23,6 +23,11 @@ let package = Package(
             ],
             path: "Sources/MLXPose"
         ),
+        .executableTarget(
+            name: "MLXPoseDemo",
+            dependencies: ["MLXPose"],
+            path: "Examples/MLXPoseDemo"
+        ),
         .testTarget(
             name: "MLXPoseTests",
             dependencies: ["MLXPose"],

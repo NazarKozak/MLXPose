@@ -81,17 +81,28 @@ Use **Xcode's build system** (not `swift test` — the CLI SPM build doesn't bun
 mlx-swift's GPU metallib):
 
 ```bash
-xcodebuild test -scheme MLXPose -destination 'platform=macOS'
+xcodebuild test -scheme MLXPose-Package -destination 'platform=macOS'
 ```
 
-Tests cover: heatmap parity (`max|Δ|=1.5e-6`), decoded-keypoint parity
-(`max 3e-5 px`), and an end-to-end render that draws a skeleton on a real image
-(`Examples/output/annotated.png`).
+Tests cover: heatmap parity (`max|Δ|=1.5e-6`), decoded-keypoint parity (`max 3e-5 px`),
+an end-to-end image render (`Examples/output/annotated.png`), video annotation,
+the Hub auto-download, and a GPU FPS benchmark.
 
 ## Demo
 
-See [`Examples/MLXPoseDemo`](Examples/MLXPoseDemo) — a SwiftUI app streaming the camera
-through MLXPose with a live skeleton overlay (`PoseOverlay`).
+[`Examples/MLXPoseDemo`](Examples/MLXPoseDemo) is a macOS SwiftUI app — **open a video and
+every frame gets a skeleton** (the annotated result loops, perfect for screen-recording):
+
+```bash
+open Package.swift     # then pick the "MLXPoseDemo" scheme → Run → "Open Video…"
+```
+
+Or annotate a video straight from the library:
+
+```swift
+let estimator = try await PoseEstimator(model: .vitPoseBaseSimple)
+try await VideoPoseAnnotator.annotate(input: inURL, output: outURL, with: estimator)
+```
 
 ## Licensing
 
