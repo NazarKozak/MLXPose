@@ -6,8 +6,9 @@ MLXPose runs [ViTPose](https://github.com/ViTAE-Transformer/ViTPose) (a vision-t
 
 > **Status: working & verified.** The full Swift pipeline (affine preprocessing → ViTPose →
 > DARK sub-pixel decode) is numerically matched against the Hugging Face reference:
-> heatmaps `max|Δ| = 1.5e-6`, decoded keypoints `max error = 3e-5 px`. Packaging polish
-> (HF weights upload, ViTPose++, docs) still in progress.
+> heatmaps `max|Δ| = 1.5e-6`, decoded keypoints `max error = 3e-5 px`.
+> **Real-time: 57.7 FPS (17.3 ms/frame) on an Apple M1 Max** (base model, batch 1, 256×192).
+> Weights auto-download from the [Hub](https://huggingface.co/nazarkozak/vitpose-base-simple-mlx).
 
 ---
 
